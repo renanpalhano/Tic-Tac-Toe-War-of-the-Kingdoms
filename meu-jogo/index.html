@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="O Grande Duelo dos Reinos — Tic-Tac-Toe Medieval em HTML5. Jogo interativo com IA, efeitos visuais épicos e som medieval. Pronto para monetização.">
+    <meta name="theme-color" content="#050403">
+    
+    <title>O Grande Duelo dos Reinos — Tic-Tac-Toe Medieval</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- =========================================================
+         CAMADA DE FUNDO
+         ========================================================= -->
+
+    <div class="world-background" aria-hidden="true"></div>
+    <div class="world-vignette" aria-hidden="true"></div>
+
+
+    <!-- =========================================================
+         MENU INICIAL — ESCOLHA DE SÍMBOLO E COR DO ESTANDARTE
+         ========================================================= -->
+
+    <div class="start-screen" id="startScreen">
+        <div class="start-screen-backdrop"></div>
+
+        <div class="start-screen-box">
+            <button class="language-switch start-language-switch" id="languageButtonStart" type="button">
+                <span class="language-text">EN</span>
+            </button>
+
+            <div class="start-crown">♕</div>
+
+            <h1 class="start-title" data-i18n="startTitle">ESCOLHA SEU ESTANDARTE</h1>
+            <p class="start-subtitle" data-i18n="startSubtitle">Antes da batalha começar, escolha seu símbolo e a cor do seu reino.</p>
+
+            <div class="start-section">
+                <div class="start-section-label" data-i18n="startChooseSymbol">SEU SÍMBOLO</div>
+                <div class="start-symbol-options">
+                    <button class="start-symbol-button is-selected" id="chooseSymbolX" type="button" data-symbol="X">
+                        <span class="start-symbol-glyph">X</span>
+                        <span data-i18n="startSymbolX">ESPADA (X)</span>
+                    </button>
+                    <button class="start-symbol-button" id="chooseSymbolO" type="button" data-symbol="O">
+                        <span class="start-symbol-glyph">O</span>
+                        <span data-i18n="startSymbolO">ESCUDO (O)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="start-section">
+                <div class="start-section-label" data-i18n="startChooseColor">COR DO REINO</div>
+                <div class="start-color-options" id="startColorOptions"></div>
+            </div>
+
+            <button class="start-begin-button" id="startBeginButton" type="button">
+                <span data-i18n="startBegin">INICIAR BATALHA</span>
+            </button>
+
+            <div class="start-enemy-note">
+                <span data-i18n="startEnemyLabel">Reino inimigo:</span>
+                <span class="start-enemy-swatch" id="startEnemySwatch"></span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =========================================================
+         CONTAINER PRINCIPAL DO JOGO
+         ========================================================= -->
+
+    <main class="game-shell" id="game">
+
+        <!-- =====================================================
+             ESTANDARTE DO JOGADOR
+             ===================================================== -->
+
+        <aside class="war-banner banner-player" id="bannerPlayer">
+            <div class="banner-pole">
+                <span class="pole-finial"></span>
+                <span class="pole-bar"></span>
+                <span class="pole-finial"></span>
+            </div>
+            <div class="banner-flag">
+                <div class="flag-texture"></div>
+                <div class="flag-content">
+                    <div class="banner-emblem-symbol" id="playerEmblemSymbol">X</div>
+                    <div class="banner-name" data-i18n="player">JOGADOR</div>
+                    <div class="banner-score" id="scorePlayer">0</div>
+                    <div class="banner-caption" data-i18n="victories">VITÓRIAS</div>
+                </div>
+            </div>
+        </aside>
+
+
+        <!-- =====================================================
+             ESTANDARTE DO COMPUTADOR
+             ===================================================== -->
+
+        <aside class="war-banner banner-enemy" id="bannerEnemy">
+            <div class="banner-pole">
+                <span class="pole-finial"></span>
+                <span class="pole-bar"></span>
+                <span class="pole-finial"></span>
+            </div>
+            <div class="banner-flag">
+                <div class="flag-texture"></div>
+                <div class="flag-content">
+                    <div class="banner-emblem-symbol" id="enemyEmblemSymbol">O</div>
+                    <div class="banner-name" data-i18n="computer">COMPUTADOR</div>
+                    <div class="banner-score" id="scoreEnemy">0</div>
+                    <div class="banner-caption" data-i18n="victories">VITÓRIAS</div>
+                </div>
+            </div>
+        </aside>
+
+
+        <!-- =====================================================
+             CABEÇALHO CENTRAL
+             ===================================================== -->
+
+        <header class="monument-header">
+            <div class="crown-decoration">♕</div>
+            <div class="title-line">
+                <span></span>
+                <i>⚔</i>
+                <span></span>
+            </div>
+            <h1 data-i18n="title">O GRANDE DUELO DOS REINOS</h1>
+            <div class="subtitle-main" data-i18n="ticTacToe">TIC-TAC-TOE</div>
+            <div class="subtitle-secondary" data-i18n="honor">HONRA • ESTRATÉGIA • GLÓRIA</div>
+            <div class="title-line bottom-line">
+                <span></span>
+                <i>◆</i>
+                <span></span>
+            </div>
+        </header>
+
+
+        <!-- =====================================================
+             STATUS DA BATALHA
+             ===================================================== -->
+
+        <section class="battle-status">
+            <div class="battle-match">
+                <span data-i18n="match">PARTIDA</span>
+                <strong id="matchNumber">1</strong>
+                <span data-i18n="of">DE</span>
+                <strong id="matchTotal">5</strong>
+            </div>
+            <div class="battle-versus">
+                <span class="versus-player">X</span>
+                <span class="versus-text">VS</span>
+                <span class="versus-enemy">O</span>
+            </div>
+            <div class="turn-status" id="turnStatus" aria-live="polite">
+                <span class="turn-light"></span>
+                <span id="turnText" data-i18n="playerTurn">VEZ DO JOGADOR</span>
+            </div>
+        </section>
+
+
+        <!-- =====================================================
+             ARENA DE BATALHA - TABULEIRO
+             ===================================================== -->
+
+        <section class="arena">
+            <div class="board-stage" id="board">
+                <img class="board-texture" src="assets/imagens/moldura.png" alt="Tabuleiro medieval" draggable="false">
+
+                <!-- Linhas da grade 3x3, desenhadas nas coordenadas reais
+                     medidas na própria moldura.png (garante a divisão
+                     visível do jogo da velha, independente da textura
+                     das pedras) -->
+                <svg class="board-grid-lines" viewBox="0 0 1536 1024" preserveAspectRatio="none" aria-hidden="true">
+                    <line class="grid-line-shadow" x1="665.2" y1="255.0" x2="610.2" y2="805.5" />
+                    <line class="grid-line-shadow" x1="906.8" y1="255.5" x2="992.0" y2="805.5" />
+                    <line class="grid-line-shadow" x1="361.1" y1="398.1" x2="1190.9" y2="399.2" />
+                    <line class="grid-line-shadow" x1="282.8" y1="580.4" x2="1263.8" y2="579.7" />
+
+                    <line class="grid-line-highlight" x1="669.2" y1="255.0" x2="614.2" y2="805.5" />
+                    <line class="grid-line-highlight" x1="910.8" y1="255.5" x2="996.0" y2="805.5" />
+                    <line class="grid-line-highlight" x1="361.1" y1="402.1" x2="1190.9" y2="403.2" />
+                    <line class="grid-line-highlight" x1="282.8" y1="584.4" x2="1263.8" y2="583.7" />
+                </svg>
+
+                <div class="board-cells" id="gameGrid">
+
+                    <!-- FILA 1: TOPO -->
+                    <button class="cell cell-0" data-index="0" type="button" aria-label="Casa 1">
+                        <svg class="impact-crack" viewBox="0 0 100 100" aria-hidden="true">
+                            <path d="M 53.0,54.3 L 60.4,43.5 L 74.5,38.6 L 83.7,36.5" />
+                            <path d="M 57.9,43.7 L 47.4,50.8 L 40.3,57.2 L 28.8,64.1 L 22.7,70.4" />
+                        </svg>
+                    </button>
+                    <button class="cell cell-1" data-index="1" type="button" aria-label="Casa 2">
+                        <svg class="impact-crack" viewBox="0 0 100 100" aria-hidden="true">
+                            <path d="M 43.5,51.9 L 44.7,39.8 L 47.9,29.4 L 51.0,21.0 L 58.6,10.7 L 61.7,5.0" />
+                            <path d="M 49.1,57.4 L 43.4,50.9 L 33.9,45.6 L 24.0,34.8" />
+                        </svg>
+                    </button>
+                    <button class="cell cell-2" data-index="2" type="button" aria-label="Casa 3">
+                        <svg class="impact-crack" viewBox="0 0 100 100" aria-hidden="true">
+                            <path d="M 44.2,50.9 L 56.1,51.7 L 66.0,47.9 L 81.0,47.7 L 88.1,54.3" />
+                            <path d="M 49.9,54.8 L 51.9,67.0 L 54.0,82.3 L 58.3,90.3 L 55.4,95.0" />
+                        </svg>
+                    </button>
+
+                    <!-- FILA 2: MEIO -->
+                    <button class="cell cell-3" data-index="3" type="button" aria-label="Casa 4">
+                        <svg class="impact-crack" viewBox="0 0 100 100" aria-hidden="true">
+                            <path d="M 51.9,42.1 L 38.7,51.2 L 33.3,59.1 L 34.3,68.6" />
+                            <path d="M 53.1,47.9 L 62.2,53.6 L 73.0,54.0 L 83.1,45.5 L 86.5,37.0" />
+                        </svg>
+                    </button>
+                    <button class="cell cell-4" data-index="4" type="button" aria-label="Casa 5">
+                        <svg class="impact-crack" viewBox="0 0 100 100" aria-hidden="true">
+                            <path d="M 45.0,56.4 L 42.7,70.4 L 48.9,79.2 L 54.9,86.9 L 54.3,95.0 L 52.0,95.0" />
+                            <path d="M 49.0,46.9 L 43.1,60.6 L 47.3,75.2 L 56.8,86.9" />
+                        </svg>
+                    </button>
+                    <button class="cell cell-5" data-index="5" type="button" aria-label="Casa 6">
+                        <svg class="impact-crack" viewBox="0 0 100 100" aria-hidden="true">
+                            <path d="M 47.6,54.7 L 54.5,42.3 L 56.8,33.3 L 57.0,19.3" />
+                            <path d="M 52.5,47.6 L 53.8,60.5 L 48.9,71.4 L 37.6,78.6" />
+                        </svg>
+                    </button>
+
+                    <!-- FILA 3: BASE -->
+                    <button class="cell cell-6" data-index="6" type="button" aria-label="Casa 7">
+                        <svg class="impact-crack" viewBox="0 0 100 100" aria-hidden="true">
+                            <path d="M 51.6,46.8 L 38.7,41.0 L 25.0,35.9 L 15.4,27.4" />
+                            <path d="M 49.2,57.5 L 61.3,64.2 L 66.4,77.4 L 75.9,88.4 L 90.1,91.1 L 95.0,85.8" />
+                        </svg>
+                    </button>
+                    <button class="cell cell-7" data-index="7" type="button" aria-label="Casa 8">
+                        <svg class="impact-crack" viewBox="0 0 100 100" aria-hidden="true">
+                            <path d="M 53.1,50.6 L 67.6,46.1 L 74.8,32.9 L 77.4,23.0 L 82.6,9.9 L 90.0,5.0" />
+                            <path d="M 55.3,51.0 L 64.3,45.5 L 66.7,36.3 L 75.8,28.1 L 77.2,19.4 L 73.6,5.0" />
+                        </svg>
+                    </button>
+                    <button class="cell cell-8" data-index="8" type="button" aria-label="Casa 9">
+                        <svg class="impact-crack" viewBox="0 0 100 100" aria-hidden="true">
+                            <path d="M 56.2,46.0 L 43.5,55.1 L 28.4,55.7 L 17.6,51.8 L 8.4,51.0" />
+                            <path d="M 42.2,57.1 L 51.9,67.3 L 64.5,67.6 L 73.0,70.1 L 79.2,75.7 L 81.9,84.5" />
+                        </svg>
+                    </button>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- =====================================================
+             BARRA DE CONTROLE INFERIOR
+             ===================================================== -->
+
+        <nav>
+            <button class="hud-button" id="rulesButton" type="button">
+                <span class="hud-icon">📜</span>
+                <span data-i18n="rules">REGRAS</span>
+            </button>
+
+            <button class="hud-button" id="settingsButton" type="button">
+                <span class="hud-icon">⚙</span>
+                <span data-i18n="settings">CONFIG</span>
+            </button>
+
+            <button class="hud-button" id="soundButton" type="button">
+                <span class="hud-icon">🔊</span>
+                <span data-i18n="sound">SOM</span>
+            </button>
+
+            <button class="hud-button" id="restartButton" type="button">
+                <span class="hud-icon">↻</span>
+                <span data-i18n="restart">REINICIAR</span>
+            </button>
+
+            <button class="language-switch" id="languageButton" type="button">
+                <span class="language-text" id="languageText">EN</span>
+            </button>
+        </nav>
+
+
+        <!-- =====================================================
+             PAINEL DE CONTROLE DE SOM
+             ===================================================== -->
+
+        <div class="sound-panel" id="soundPanel">
+            <div class="sound-panel-title" data-i18n="soundTitle">CONTROLE DE SOM</div>
+
+            <button class="mute-all-button" id="muteAllButton" type="button">
+                <span class="mute-all-icon" id="muteAllIcon">🔊</span>
+                <span id="muteAllLabel" data-i18n="muteAll">SILENCIAR TUDO</span>
+            </button>
+
+            <div class="sound-row">
+                <span class="sound-row-label" data-i18n="musicVolumeLabel">MÚSICA</span>
+                <div class="sound-row-control">
+                    <span class="sound-row-icon">♫</span>
+                    <input id="musicVolumeSlider" type="range" min="0" max="100" step="1" value="65">
+                    <span class="sound-row-value" id="musicVolumeValue">65%</span>
+                </div>
+            </div>
+
+            <div class="sound-row">
+                <span class="sound-row-label" data-i18n="sfxVolumeLabel">EFEITOS SONOROS</span>
+                <div class="sound-row-control">
+                    <span class="sound-row-icon">⚔</span>
+                    <input id="sfxVolumeSlider" type="range" min="0" max="100" step="1" value="65">
+                    <span class="sound-row-value" id="sfxVolumeValue">65%</span>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- =====================================================
+             MODAL: REGRAS DO DUELO
+             ===================================================== -->
+
+        <div class="modal" id="rulesModal" aria-hidden="true">
+            <div class="modal-backdrop"></div>
+            <div class="modal-box">
+                <button class="modal-close" data-close="rulesModal" type="button">×</button>
+                <div class="modal-symbol">📜</div>
+                <h2 data-i18n="rulesTitle">REGRAS DO DUELO</h2>
+                <div class="rules-content">
+                    <p data-i18n="rule1">O jogador controla a espada X.</p>
+                    <p data-i18n="rule2">O computador controla o escudo O.</p>
+                    <p data-i18n="rule3">Complete uma linha com três símbolos para vencer a batalha.</p>
+                    <p data-i18n="rule4">A rodada é disputada em até cinco partidas.</p>
+                    <p data-i18n="rule5">O primeiro reino a conquistar três vitórias vence a rodada.</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- =====================================================
+             MODAL: CONFIGURAÇÕES
+             ===================================================== -->
+
+        <div class="modal" id="settingsModal" aria-hidden="true">
+            <div class="modal-backdrop"></div>
+            <div class="modal-box">
+                <button class="modal-close" data-close="settingsModal" type="button">×</button>
+                <div class="modal-symbol">⚙</div>
+                <h2 data-i18n="settingsTitle">CONFIGURAÇÕES</h2>
+                <p class="settings-description" data-i18n="settingsDescription">
+                    Utilize o menu inferior para controlar o áudio e o idioma.
+                </p>
+            </div>
+        </div>
+
+
+        <!-- =====================================================
+             MODAL: RESULTADO DA BATALHA
+             ===================================================== -->
+
+        <div class="modal result-modal" id="resultModal" aria-hidden="true">
+            <div class="modal-backdrop"></div>
+            <div class="modal-box result-box">
+                <div class="result-symbol" id="resultIcon">⚔</div>
+                <div class="result-kicker" id="resultKicker" data-i18n="battleFinished">BATALHA CONCLUÍDA</div>
+                <h2 id="resultTitle">VITÓRIA!</h2>
+                <p id="resultMessage">O reino inimigo foi derrotado.</p>
+                
+                <div class="result-score">
+                    <div>
+                        <small data-i18n="player">JOGADOR</small>
+                        <strong id="modalPlayerScore">0</strong>
+                    </div>
+                    <span>:</span>
+                    <div>
+                        <small data-i18n="computer">COMPUTADOR</small>
+                        <strong id="modalEnemyScore">0</strong>
+                    </div>
+                </div>
+
+                <div class="result-countdown" id="resultCountdown" aria-live="polite"></div>
+
+                <button class="modal-primary-button" id="nextRoundButton" type="button">
+                    PRÓXIMA BATALHA
+                </button>
+
+                <button class="modal-secondary-button" id="resetScoreButton" type="button">
+                    REINICIAR PLACAR
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+
+    <!-- =========================================================
+         ÁUDIO DO JOGO
+         ========================================================= -->
+
+    <audio id="backgroundMusic" src="assets/sons/watermelon_beats-medieval-folk-music-505203.mp3" loop preload="auto"></audio>
+    <audio id="playerSound" src="assets/sons/som-espada.mp3" preload="auto"></audio>
+    <audio id="enemySound" src="assets/sons/som-espada-inimiga.mp3" preload="auto"></audio>
+
+
+    <!-- =========================================================
+         EFEITO DE TELA TREMENDO
+         ========================================================= -->
+
+    <div class="screen-shake-layer" id="screenShake"></div>
+
+
+    <!-- =========================================================
+         SCRIPT PRINCIPAL
+         ========================================================= -->
+
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>
